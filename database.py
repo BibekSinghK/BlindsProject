@@ -6,6 +6,8 @@ class Database:
         self.cursor = self.conn.cursor()
 
     def create_tables(self):
+        self.conn.execute("PRAGMA foreign_keys = ON;")
+        
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS customers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

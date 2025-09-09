@@ -21,6 +21,7 @@ class EditOrdersPage(ctk.CTkFrame):
 
         self.conn = sqlite3.connect("blinds_app.db")
         self.cursor = self.conn.cursor()
+        self.conn.execute("PRAGMA foreign_keys = ON;")
 
         self.load_customers()
 
@@ -41,14 +42,14 @@ class EditOrdersPage(ctk.CTkFrame):
             sheet_path = f"cost_sheets/{name}_cost_sheet.xlsx"
             if os.path.exists(sheet_path):
                 open_btn = ctk.CTkButton(row_frame, text="Open Sheet", width=120,
-                                         command=lambda path=sheet_path: self.open_sheet(path))
+                                         command=lambda: self.open_sheet(sheet_path))
                 open_btn.pack(side="left", padx=10)
             else:
                 no_sheet_label = ctk.CTkLabel(row_frame, text="No sheet available", text_color="red")
                 no_sheet_label.pack(side="left", padx=10)
 
             delete_btn = ctk.CTkButton(row_frame, text="Delete", fg_color="red",
-                                       command=lambda cid=customer_id: self.delete_customer(cid))
+                                       command=lambda: self.delete_customer(customer_id, name))
             delete_btn.pack(side="right", padx=10)
 
     def open_sheet(self, path):
@@ -60,7 +61,11 @@ class EditOrdersPage(ctk.CTkFrame):
         elif os_type == "Linux":
             os.system(f'xdg-open "{path}"')
 
-    def delete_customer(self, customer_id):
+    def delete_customer(self, customer_id, name):
         self.cursor.execute("DELETE FROM customers WHERE id = ?", (customer_id,))
         self.conn.commit()
+        folder_path = "cost_sheets"
+        file_name = f"{name}_cost_sheet.xlsx"
+        file_path = os.path.join(folder_path, file_name)
+        os.remove(file_path)
         self.load_customers()
