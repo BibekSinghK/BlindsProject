@@ -53,4 +53,5 @@ class OrderCreationPage(ctk.CTkFrame):
         else:
             customer_id = self.master.db.add_customer(customer_name)
             self.master.curr_customer = Customer(customer_name, customer_id)
+            self.customer_name_entry.delete(0, "end")
             self.master.show_frame(self.master.blind_creation_page)

@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from excelGenerator import ExcelGenerator
+from tkinter import messagebox
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
@@ -142,6 +143,11 @@ class BlindCreationPage(ctk.CTkFrame):
         self.control_pos.set("Left")
         self.bracket.set("#8")
         self.quantity_entry.delete(0, "end")
+
+    def check_field(self):
+        if self.location_entry.get() == "" or self.width_entry.get() == "" or self.height_entry.get() == "" or self.quantity_entry.get() == "":
+            return False
+        return True
     
     def add_blind(self):
         
@@ -158,23 +164,26 @@ class BlindCreationPage(ctk.CTkFrame):
             }
             return float(value) + fraction_map.get(fraction, 0)
         
-        location = self.location_entry.get()
-        blind_type = self.blind_type.get()
-        fabric = self.fabric.get()
-        width = f"{convert_to_decimal(self.width_entry.get(), self.width_fraction.get())}"
-        height = f"{convert_to_decimal(self.height_entry.get(), self.height_fraction.get())}"
-        control = self.control.get()
-        control_mat = self.control_mat.get()
-        control_pos = self.control_pos.get()
-        bracket = self.bracket.get()
-        quantity = self.quantity_entry.get()
-        price = self.master.db.get_blind_price(blind_type, fabric)
+        if self.check_field():
+            location = self.location_entry.get()
+            blind_type = self.blind_type.get()
+            fabric = self.fabric.get()
+            width = f"{convert_to_decimal(self.width_entry.get(), self.width_fraction.get())}"
+            height = f"{convert_to_decimal(self.height_entry.get(), self.height_fraction.get())}"
+            control = self.control.get()
+            control_mat = self.control_mat.get()
+            control_pos = self.control_pos.get()
+            bracket = self.bracket.get()
+            quantity = self.quantity_entry.get()
+            price = self.master.db.get_blind_price(blind_type, fabric)
+            
+            self.master.curr_customer.addBlind(location, blind_type, fabric, width, height, control, control_mat, control_pos, bracket, quantity, price)
+            self.master.db.add_blind(self.master.curr_customer.id, location, blind_type, fabric, width, height, control, control_mat, control_pos, bracket, quantity, price)
 
-        self.master.curr_customer.addBlind(location, blind_type, fabric, width, height, control, control_mat, control_pos, bracket, quantity, price)
-        self.master.db.add_blind(self.master.curr_customer.id, location, blind_type, fabric, width, height, control, control_mat, control_pos, bracket, quantity, price)
-
-        self.refresh_list()
-        self.reset_fields()
+            self.refresh_list()
+            self.reset_fields()
+        else:
+            messagebox.showwarning("Warning", "One or more fields is empty!")
 
     def refresh_list(self):
         for widget in self.blinds_widgets:
@@ -199,9 +208,8 @@ class BlindCreationPage(ctk.CTkFrame):
         self.master.curr_customer.blinds.remove(blind)
         self.master.curr_customer.blindCount -= 1
         self.refresh_list()
-
+    
     def done(self):
-        print(f"Customer {self.master.curr_customer.name} has {len(self.master.curr_customer.blinds)} blinds.")
         sheet = ExcelGenerator(self.master.curr_customer)
         sheet.write_blinds()
         self.master.curr_customer = None
