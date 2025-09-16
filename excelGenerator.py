@@ -54,6 +54,12 @@ class ExcelGenerator:
 
             self.worksheet.cell(row=row, column=14, value=f"{blind.controlPos} {blind.controlMat} {blind.control}")
             self.worksheet.cell(row=row, column=15, value=blind.bracket)
+            
+            self.worksheet.cell(row=row, column=8).number_format = self.two_decimal
+            self.worksheet.cell(row=row, column=9).number_format = self.two_decimal
+            self.worksheet.cell(row=row, column=10).number_format = self.two_decimal
+            self.worksheet.cell(row=row, column=11).number_format = self.two_decimal
+            self.worksheet.cell(row=row, column=13).number_format = self.two_decimal
 
         sub_row = self.person.blindCount + 3
         ship_row = self.person.blindCount + 4
@@ -72,6 +78,10 @@ class ExcelGenerator:
             column_letter = get_column_letter(col)
             self.worksheet.column_dimensions[column_letter].auto_size = True 
 
+        self.worksheet.cell(row=sub_row, column=13).number_format = self.two_decimal
+        self.worksheet.cell(row=ship_row, column=13).number_format = self.two_decimal
+        self.worksheet.cell(row=total_row, column=13).number_format = self.two_decimal
+        
         output_dir = "cost_sheets"
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)

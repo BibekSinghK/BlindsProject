@@ -129,6 +129,20 @@ class BlindCreationPage(ctk.CTkFrame):
         self.fabric.configure(values=list(set(filtered)))
         self.fabric.set(filtered[0])
     
+    def reset_fields(self):
+        self.location_entry.delete(0, "end")
+        self.blind_type.set("Zebra")
+        self.filter.set("")
+        self.width_entry.delete(0, "end")
+        self.width_fraction.set("0")
+        self.height_entry.delete(0, "end")
+        self.height_fraction.set("0")
+        self.control.set("Chain")
+        self.control_mat.set("Plastic")
+        self.control_pos.set("Left")
+        self.bracket.set("#8")
+        self.quantity_entry.delete(0, "end")
+    
     def add_blind(self):
         
         def convert_to_decimal(value, fraction):
@@ -160,6 +174,7 @@ class BlindCreationPage(ctk.CTkFrame):
         self.master.db.add_blind(self.master.curr_customer.id, location, blind_type, fabric, width, height, control, control_mat, control_pos, bracket, quantity, price)
 
         self.refresh_list()
+        self.reset_fields()
 
     def refresh_list(self):
         for widget in self.blinds_widgets:
@@ -190,4 +205,8 @@ class BlindCreationPage(ctk.CTkFrame):
         sheet = ExcelGenerator(self.master.curr_customer)
         sheet.write_blinds()
         self.master.curr_customer = None
+        self.reset_fields()
+        for widget in self.blinds_widgets:
+            widget.destroy()
+        self.blinds_widgets.clear()
         self.master.show_frame(self.master.welcome_page)

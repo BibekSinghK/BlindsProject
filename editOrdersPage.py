@@ -42,14 +42,14 @@ class EditOrdersPage(ctk.CTkFrame):
             sheet_path = f"cost_sheets/{name}_cost_sheet.xlsx"
             if os.path.exists(sheet_path):
                 open_btn = ctk.CTkButton(row_frame, text="Open Sheet", width=120,
-                                         command=lambda: self.open_sheet(sheet_path))
+                                         command=lambda path=sheet_path: self.open_sheet(path))
                 open_btn.pack(side="left", padx=10)
             else:
                 no_sheet_label = ctk.CTkLabel(row_frame, text="No sheet available", text_color="red")
                 no_sheet_label.pack(side="left", padx=10)
 
             delete_btn = ctk.CTkButton(row_frame, text="Delete", fg_color="red",
-                                       command=lambda: self.delete_customer(customer_id, name))
+                                       command=lambda cid=customer_id, cname=name: self.delete_customer(cid, cname))
             delete_btn.pack(side="right", padx=10)
 
     def open_sheet(self, path):
